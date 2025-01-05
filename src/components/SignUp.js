@@ -11,6 +11,7 @@ import {
   Heading
 } from '@chakra-ui/react';
 import { useAuth } from '../contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 const SignUp = ({ onToggle }) => {
   const [email, setEmail] = useState('');
@@ -19,6 +20,8 @@ const SignUp = ({ onToggle }) => {
   const [loading, setLoading] = useState(false);
   const { signup } = useAuth();
   const toast = useToast();
+  const navigate = useNavigate();
+  const [error, setError] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -33,10 +36,12 @@ const SignUp = ({ onToggle }) => {
       });
     }
 
+    setError('');
     setLoading(true);
     
     try {
       await signup(email, password);
+      navigate('/');
       toast({
         title: 'Account created successfully!',
         status: 'success',
@@ -44,15 +49,9 @@ const SignUp = ({ onToggle }) => {
         isClosable: true,
       });
     } catch (error) {
-      toast({
-        title: 'Error',
-        description: error.message,
-        status: 'error',
-        duration: 3000,
-        isClosable: true,
-      });
-      setLoading(false);
+      setError('Failed to create an account: ' + error.message);
     }
+    setLoading(false);
   };
 
   return (
